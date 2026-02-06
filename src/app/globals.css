@@ -1,0 +1,83 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 0 0% 10%;
+    --primary: 14 100% 60%;
+    --primary-foreground: 0 0% 100%;
+    --muted: 0 0% 96%;
+    --muted-foreground: 0 0% 45%;
+    --border: 0 0% 90%;
+    --radius: 0.5rem;
+  }
+
+  body {
+    @apply bg-white text-gray-900 antialiased;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+  .safe-area-inset-top {
+    padding-top: env(safe-area-inset-top, 0);
+  }
+  .safe-area-inset-bottom {
+    padding-bottom: env(safe-area-inset-bottom, 0);
+  }
+  .touch-manipulation {
+    touch-action: manipulation;
+  }
+}
+
+/* 꾸밈용 유틸리티 */
+.gradient-hero {
+  background: linear-gradient(135deg, #fff7f4 0%, #ffe8e0 50%, #fff4f0 100%);
+}
+.gradient-warm {
+  background: linear-gradient(180deg, #fff9f7 0%, #fff 100%);
+}
+.pattern-dots {
+  background-image: radial-gradient(#ff6b35 1px, transparent 1px);
+  background-size: 24px 24px;
+  background-color: #fffaf8;
+}
+.shadow-card-soft {
+  box-shadow: 0 2px 12px rgba(255, 107, 53, 0.06), 0 4px 24px rgba(0, 0, 0, 0.04);
+}
+.shadow-card-hover {
+  box-shadow: 0 8px 30px rgba(255, 107, 53, 0.12), 0 4px 12px rgba(0, 0, 0, 0.06);
+}
+
+/* Pretendard 폰트 */
+@font-face {
+  font-family: "Pretendard";
+  src: url("https://cdn.jsdelivr.net/gh/Project-Noonnu/noonfonts_2107@1.1/Pretendard-Regular.woff") format("woff");
+  font-weight: 400;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Pretendard";
+  src: url("https://cdn.jsdelivr.net/gh/Project-Noonnu/noonfonts_2107@1.1/Pretendard-Medium.woff") format("woff");
+  font-weight: 500;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Pretendard";
+  src: url("https://cdn.jsdelivr.net/gh/Project-Noonnu/noonfonts_2107@1.1/Pretendard-SemiBold.woff") format("woff");
+  font-weight: 600;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Pretendard";
+  src: url("https://cdn.jsdelivr.net/gh/Project-Noonnu/noonfonts_2107@1.1/Pretendard-Bold.woff") format("woff");
+  font-weight: 700;
+  font-style: normal;
+}

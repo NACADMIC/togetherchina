@@ -1,0 +1,168 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String?
+  role      String   // 'employer' | 'talent'
+  name      String
+  phone     String?
+  avatar    String?
+  points    Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  jobs           Job[]
+  talentProfile  TalentProfile?
+  bookmarks      Bookmark[]
+  supplyOrders   SupplyOrder[]
+  communityPosts CommunityPost[]
+}
+
+model Job {
+  id          String   @id @default(cuid())
+  employerId  String
+  employer    User     @relation(fields: [employerId], references: [id], onDelete: Cascade)
+  title       String
+  position    String   // head_chef, noodle, wok, assistant, delivery, manager, server
+  description String
+  requirements String?
+  salaryMin   Int
+  salaryMax   Int
+  salaryUnit  String   // monthly, daily, hourly
+  sido        String
+  sigungu     String
+  address     String?
+  housing     Boolean  @default(false)
+  meals       Boolean  @default(false)
+  insurance   Boolean  @default(false)
+  isUrgent    Boolean  @default(false)
+  status      String   @default("open") // open, closed
+  views       Int      @default(0)
+  applicants  Int      @default(0)
+  expiresAt   DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  applications Application[]
+  bookmarks    Bookmark[]
+}
+
+model TalentProfile {
+  id               String   @id @default(cuid())
+  userId           String   @unique
+  user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  headline         String
+  position         String
+  experienceYears  Int      @default(0)
+  bio              String
+  expectedSalary   Int?
+  preferredAreas   String   // JSON array of areas
+  isPublic         Boolean  @default(true)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  applications Application[]
+  bookmarks    Bookmark[]
+}
+
+model Application {
+  id        String   @id @default(cuid())
+  jobId     String
+  job       Job      @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  talentId  String
+  talent    TalentProfile @relation(fields: [talentId], references: [id], onDelete: Cascade)
+  message   String?
+  status    String   @default("pending") // pending, viewed, contacted, rejected
+  createdAt DateTime @default(now())
+
+  @@unique([jobId, talentId])
+}
+
+model Bookmark {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  jobId     String?
+  job       Job?     @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  talentId  String?
+  talent    TalentProfile? @relation(fields: [talentId], references: [id], onDelete: Cascade)
+  type      String   // 'job' | 'talent'
+  createdAt DateTime @default(now())
+}
+
+// ========== 식자재 직접 납품 ==========
+model ProductCategory {
+  id        String    @id @default(cuid())
+  name      String    // 춘장/소스, 면류, 만두/유부, 채소/고기 등
+  slug      String    @unique
+  sortOrder Int       @default(0)
+  products  Product[]
+}
+
+model Product {
+  id          String   @id @default(cuid())
+  categoryId  String
+  category    ProductCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  name        String
+  description String?
+  price       Int      // 원 단위
+  unit        String   @default("개") // 개, 박스, kg, g
+  minOrder    Int      @default(1)   // 최소 주문 수량
+  stock       Int      @default(0)
+  imageUrl    String?
+  isActive    Boolean  @default(true)
+  sortOrder   Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  orderItems SupplyOrderItem[]
+}
+
+model SupplyOrder {
+  id            String   @id @default(cuid())
+  userId        String
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  status        String   @default("pending") // pending, confirmed, preparing, shipped, delivered, cancelled
+  totalAmount   Int      // 총 금액 (원)
+  deliveryAddress String
+  deliveryPhone String
+  deliveryNote  String?
+  paidAt        DateTime?
+  shippedAt     DateTime?
+  deliveredAt   DateTime?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  items SupplyOrderItem[]
+}
+
+model SupplyOrderItem {
+  id        String   @id @default(cuid())
+  orderId   String
+  order     SupplyOrder @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productId String
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Restrict)
+  quantity  Int
+  price     Int      // 주문 시점 가격 (원)
+}
+
+// ========== 종사자 커뮤니티 (지역별) ==========
+model CommunityPost {
+  id        String   @id @default(cuid())
+  authorId  String
+  author    User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  region    String   @default("서울") // 시도 (서울, 경기, 부산 등)
+  title     String
+  content   String
+  views     Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
