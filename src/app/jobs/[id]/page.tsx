@@ -12,6 +12,32 @@ interface Props {
   params: Promise<{ id: string }>;
 }
 
+type JobWithEmployer = {
+  id: string;
+  title: string;
+  position: string;
+  description: string;
+  requirements: string | null;
+  salaryMin: number;
+  salaryMax: number;
+  salaryUnit: string;
+  sido: string;
+  sigungu: string;
+  address: string | null;
+  housing: boolean;
+  meals: boolean;
+  insurance: boolean;
+  isUrgent: boolean;
+  status: string;
+  views: number;
+  applicants: number;
+  expiresAt: Date | null;
+  createdAt: Date;
+  updatedAt: Date;
+  employerId: string;
+  employer?: { name: string; phone: string | null } | null;
+};
+
 function formatSalary(min: number, max: number, unit: string) {
   const unitLabel = unit === "monthly" ? "만원" : unit === "daily" ? "원/일" : "원/시";
   if (min === max) return `${min.toLocaleString()}${unitLabel}`;
@@ -21,7 +47,7 @@ function formatSalary(min: number, max: number, unit: string) {
 export default async function JobDetailPage({ params }: Props) {
   const { id } = await params;
 
-  let job: Awaited<ReturnType<typeof prisma.job.findUnique>> | null = null;
+  let job: JobWithEmployer | null = null;
   if (id.startsWith("mock-")) {
     const mock = MOCK_JOBS.find((j) => j.id === id);
     if (mock) {
@@ -32,14 +58,14 @@ export default async function JobDetailPage({ params }: Props) {
         address: mock.sido && mock.sigungu ? `${mock.sido} ${mock.sigungu}` : "",
         insurance: false,
         employer: { ...mock.employer, phone: null },
-      } as unknown as Awaited<ReturnType<typeof prisma.job.findUnique>>;
+      } as JobWithEmployer;
     }
   } else {
     try {
       job = await prisma.job.findUnique({
         where: { id },
         include: { employer: { select: { name: true, phone: true } } },
-      });
+      }) as JobWithEmployer | null;
     } catch {
       job = null;
     }
