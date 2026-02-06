@@ -12,21 +12,36 @@ interface Props {
   params: Promise<{ id: string }>;
 }
 
+type TalentWithUser = {
+  id: string;
+  userId: string;
+  headline: string;
+  position: string;
+  experienceYears: number;
+  bio: string;
+  expectedSalary: number | null;
+  preferredAreas: string;
+  isPublic: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+  user?: { name: string; phone?: string | null } | null;
+};
+
 export default async function TalentDetailPage({ params }: Props) {
   const { id } = await params;
 
-  let talent: Awaited<ReturnType<typeof prisma.talentProfile.findUnique>> | null = null;
+  let talent: TalentWithUser | null = null;
   if (id.startsWith("mock-")) {
     const mock = MOCK_TALENTS.find((t) => t.id === id);
     if (mock) {
-      talent = mock as unknown as Awaited<ReturnType<typeof prisma.talentProfile.findUnique>>;
+      talent = mock as TalentWithUser;
     }
   } else {
     try {
       talent = await prisma.talentProfile.findUnique({
         where: { id },
         include: { user: { select: { name: true, phone: true } } },
-      });
+      }) as TalentWithUser | null;
     } catch {
       talent = null;
     }

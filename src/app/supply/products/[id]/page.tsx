@@ -8,19 +8,36 @@ interface Props {
   params: Promise<{ id: string }>;
 }
 
+type ProductWithCategory = {
+  id: string;
+  name: string;
+  description: string | null;
+  price: number;
+  unit: string;
+  minOrder: number;
+  stock: number;
+  imageUrl: string | null;
+  isActive: boolean;
+  sortOrder: number;
+  categoryId: string;
+  createdAt: Date;
+  updatedAt: Date;
+  category: { name: string; slug: string };
+};
+
 export default async function ProductDetailPage({ params }: Props) {
   const { id } = await params;
 
-  let product: Awaited<ReturnType<typeof prisma.product.findUnique>> | (typeof MOCK_PRODUCTS)[0] | null = null;
+  let product: ProductWithCategory | null = null;
   if (id.startsWith("mock-")) {
     const found = MOCK_PRODUCTS.find((p) => p.id === id);
-    product = found ? (found as unknown as Awaited<ReturnType<typeof prisma.product.findUnique>>) : null;
+    product = found ? (found as ProductWithCategory) : null;
   } else {
     try {
       product = await prisma.product.findUnique({
         where: { id },
         include: { category: true },
-      });
+      }) as ProductWithCategory | null;
     } catch {
       product = null;
     }
