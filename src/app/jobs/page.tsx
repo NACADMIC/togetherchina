@@ -8,6 +8,23 @@ import { Plus } from "lucide-react";
 
 export const dynamic = "force-dynamic";
 
+type JobListItem = {
+  id: string;
+  title: string;
+  position: string;
+  salaryMin: number;
+  salaryMax: number;
+  salaryUnit: string;
+  sido: string;
+  sigungu: string;
+  housing: boolean;
+  meals: boolean;
+  isUrgent: boolean;
+  views: number;
+  applicants: number;
+  employer?: { name: string } | null;
+};
+
 interface SearchParams {
   searchParams: Promise<{
     q?: string;
@@ -31,15 +48,15 @@ export default async function JobsPage({ searchParams }: SearchParams) {
   if (housing === "true") where.housing = true;
   if (meals === "true") where.meals = true;
 
-  let jobs: Awaited<ReturnType<typeof prisma.job.findMany>> = [];
+  let jobs: JobListItem[] = [];
   try {
     jobs = await prisma.job.findMany({
       where,
       orderBy: [{ isUrgent: "desc" }, { createdAt: "desc" }],
       include: { employer: { select: { name: true } } },
-    });
+    }) as JobListItem[];
   } catch {
-    jobs = MOCK_JOBS;
+    jobs = MOCK_JOBS as JobListItem[];
   }
 
   return (

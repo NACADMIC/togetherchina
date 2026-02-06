@@ -5,6 +5,25 @@ import { ProductCard } from "@/components/supply/product-card";
 
 export const dynamic = "force-dynamic";
 
+type ProductListItem = {
+  id: string;
+  name: string;
+  description: string | null;
+  price: number;
+  unit: string;
+  minOrder: number;
+  isActive: boolean;
+  categoryId: string;
+  category?: { name: string; slug: string } | null;
+};
+
+type CategoryItem = {
+  id: string;
+  name: string;
+  slug: string;
+  sortOrder: number;
+};
+
 interface SearchParams {
   searchParams: Promise<{ category?: string }>;
 }
@@ -13,8 +32,8 @@ export default async function SupplyProductsPage({ searchParams }: SearchParams)
   const params = await searchParams;
   const categorySlug = params.category;
 
-  let products: Awaited<ReturnType<typeof prisma.product.findMany>> = [];
-  let categories: Awaited<ReturnType<typeof prisma.productCategory.findMany>> = [];
+  let products: ProductListItem[] = [];
+  let categories: CategoryItem[] = [];
   try {
     await seedSupplyIfEmpty();
     const where: { isActive: boolean; categoryId?: string } = { isActive: true };
@@ -27,15 +46,15 @@ export default async function SupplyProductsPage({ searchParams }: SearchParams)
     products = await prisma.product.findMany({
       where,
       orderBy: [{ category: { sortOrder: "asc" } }, { sortOrder: "asc" }],
-    });
+    }) as ProductListItem[];
     categories = await prisma.productCategory.findMany({
       orderBy: { sortOrder: "asc" },
-    });
+    }) as CategoryItem[];
   } catch {
-    products = categorySlug
+    products = (categorySlug
       ? MOCK_PRODUCTS.filter((p) => p.category?.slug === categorySlug)
-      : MOCK_PRODUCTS;
-    categories = MOCK_CATEGORIES;
+      : MOCK_PRODUCTS) as ProductListItem[];
+    categories = MOCK_CATEGORIES as CategoryItem[];
   }
 
   return (

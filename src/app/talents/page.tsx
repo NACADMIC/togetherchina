@@ -8,6 +8,17 @@ import { Plus } from "lucide-react";
 
 export const dynamic = "force-dynamic";
 
+type TalentListItem = {
+  id: string;
+  headline: string;
+  position: string;
+  experienceYears: number;
+  bio: string;
+  expectedSalary: number | null;
+  preferredAreas: string;
+  user?: { name: string } | null;
+};
+
 interface SearchParams {
   searchParams: Promise<{
     q?: string;
@@ -23,15 +34,15 @@ export default async function TalentsPage({ searchParams }: SearchParams) {
   if (q) where.OR = [{ headline: { contains: q } }, { bio: { contains: q } }];
   if (position) where.position = position;
 
-  let talents: Awaited<ReturnType<typeof prisma.talentProfile.findMany>> = [];
+  let talents: TalentListItem[] = [];
   try {
     talents = await prisma.talentProfile.findMany({
       where,
       orderBy: { updatedAt: "desc" },
       include: { user: { select: { name: true } } },
-    });
+    }) as TalentListItem[];
   } catch {
-    talents = MOCK_TALENTS;
+    talents = MOCK_TALENTS as TalentListItem[];
   }
 
   return (

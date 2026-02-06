@@ -13,7 +13,7 @@ if not exist .git (
 )
 
 git add .
-git commit -m "Fix TypeScript type errors"
+git commit -m "Fix all TypeScript type errors"
 REM Continue even if commit had nothing new (already committed)
 
 git remote remove origin 2>nul

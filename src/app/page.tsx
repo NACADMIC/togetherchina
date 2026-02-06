@@ -9,29 +9,57 @@ import { MOCK_JOBS, MOCK_TALENTS } from "@/lib/mock-data";
 
 export const dynamic = "force-dynamic";
 
-async function getRecentJobs() {
+type JobListItem = {
+  id: string;
+  title: string;
+  position: string;
+  salaryMin: number;
+  salaryMax: number;
+  salaryUnit: string;
+  sido: string;
+  sigungu: string;
+  housing: boolean;
+  meals: boolean;
+  isUrgent: boolean;
+  views: number;
+  applicants: number;
+  employer?: { name: string } | null;
+};
+
+type TalentListItem = {
+  id: string;
+  headline: string;
+  position: string;
+  experienceYears: number;
+  bio: string;
+  expectedSalary: number | null;
+  preferredAreas: string;
+  user?: { name: string } | null;
+};
+
+async function getRecentJobs(): Promise<JobListItem[]> {
   try {
     return await prisma.job.findMany({
       where: { status: "open" },
       orderBy: { createdAt: "desc" },
       take: 6,
       include: { employer: { select: { name: true } } },
-    });
+    }) as JobListItem[];
   } catch {
-    return MOCK_JOBS;
+    return MOCK_JOBS as JobListItem[];
   }
 }
 
-async function getRecentTalents() {
+async function getRecentTalents(): Promise<TalentListItem[]> {
   try {
     return await prisma.talentProfile.findMany({
       where: { isPublic: true },
       orderBy: { updatedAt: "desc" },
       take: 6,
       include: { user: { select: { name: true } } },
-    });
+    }) as TalentListItem[];
   } catch {
-    return MOCK_TALENTS;
+    return MOCK_TALENTS as TalentListItem[];
   }
 }
 
