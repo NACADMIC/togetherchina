@@ -13,7 +13,7 @@ if not exist .git (
 )
 
 git add .
-git commit -m "Initial"
+git commit -m "Add vercel.json for build"
 REM Continue even if commit had nothing new (already committed)
 
 git remote remove origin 2>nul
