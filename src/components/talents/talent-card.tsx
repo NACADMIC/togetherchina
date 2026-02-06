@@ -14,7 +14,7 @@ interface TalentCardProps {
     bio: string;
     expectedSalary: number | null;
     preferredAreas: string;
-    user?: { name: string };
+    user?: { name: string } | null;
   };
 }
 

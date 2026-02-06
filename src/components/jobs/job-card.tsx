@@ -20,7 +20,7 @@ interface JobCardProps {
     isUrgent: boolean;
     views: number;
     applicants: number;
-    employer?: { name: string };
+    employer?: { name: string } | null;
   };
 }
 

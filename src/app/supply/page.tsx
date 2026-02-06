@@ -8,7 +8,24 @@ import { Button } from "@/components/ui/button";
 
 export const dynamic = "force-dynamic";
 
-async function getCategoriesWithProducts() {
+type CategoryWithProducts = {
+  id: string;
+  name: string;
+  slug: string;
+  sortOrder: number;
+  products: {
+    id: string;
+    name: string;
+    description: string | null;
+    price: number;
+    unit: string;
+    minOrder: number;
+    isActive: boolean;
+    categoryId: string;
+  }[];
+};
+
+async function getCategoriesWithProducts(): Promise<CategoryWithProducts[]> {
   try {
     await seedSupplyIfEmpty();
     return await prisma.productCategory.findMany({
@@ -21,9 +38,9 @@ async function getCategoriesWithProducts() {
           take: 6,
         },
       },
-    });
+    }) as CategoryWithProducts[];
   } catch {
-    return MOCK_CATEGORIES_WITH_PRODUCTS;
+    return MOCK_CATEGORIES_WITH_PRODUCTS as CategoryWithProducts[];
   }
 }
 
