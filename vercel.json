@@ -1,3 +1,0 @@
-{
-  "buildCommand": "DATABASE_URL=postgresql://localhost:5432/dummy npx prisma generate && npx next build"
-}
